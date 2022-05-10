@@ -51,7 +51,7 @@ public:
    * @param displacement_grad Displacement gradient with respect to the reference configuration (displacement_grad)
    * @param bulk_parameter The parameterized bulk modulus
    * @param shear_parameter The parameterized shear modulus
-   * @return The calculated material response (density, Kirchoff stress) for the material
+   * @return The calculated material response (density, Cauchy stress) for the material
    */
   template <typename PositionType, typename DisplacementType, typename DispGradType, typename BulkType,
             typename ShearType>
@@ -121,7 +121,7 @@ public:
    * @param displacement_grad Displacement gradient with respect to the reference configuration (displacement_grad)
    * @param bulk_parameter The parameterized bulk modulus
    * @param shear_parameter The parameterized shear modulus
-   * @return The calculated material response (density, kirchoff stress) for the material
+   * @return The calculated material response (density, Cauchy stress) for the material
    */
   template <typename PositionType, typename DisplacementType, typename DispGradType, typename BulkType,
             typename ShearType>
@@ -143,7 +143,7 @@ public:
     // be removed by either putting the dual implementation of the global namespace or implementing a pure
     // double version there. More investigation into argument-dependent lookup is needed.
     using std::log;
-    auto stress = lambda * log(J) * I + shear_modulus * B_minus_I;
+    auto stress = (lambda * log(J) * I + shear_modulus * B_minus_I) / J;
 
     return MaterialResponse{density_, stress};
   }

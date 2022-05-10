@@ -28,7 +28,7 @@ struct MaterialResponse {
   /// Density of the material (mass/volume)
   DensityType density;
 
-  /// Kirchoff stress (det(deformation gradient) * Cauchy stress) for the constitutive model
+  /// Cauchy stress for the constitutive model
   StressType stress;
 };
 
@@ -82,7 +82,7 @@ public:
    * @tparam DisplacementType Displacement type
    * @tparam DispGradType Displacement gradient type
    * @param displacement_grad Displacement gradient with respect to the reference configuration (displacement_grad)
-   * @return The calculated material response (density, Kirchoff stress) for the material
+   * @return The calculated material response (density, Cauchy stress) for the material
    */
   template <typename PositionType, typename DisplacementType, typename DispGradType>
   SERAC_HOST_DEVICE auto operator()(const PositionType& /* x */, const DisplacementType& /* displacement */,
@@ -144,7 +144,7 @@ public:
    * @tparam DisplacementType Displacement type
    * @tparam DispGradType Displacement gradient type
    * @param displacement_grad displacement gradient with respect to the reference configuration (displacement_grad)
-   * @return The calculated material response (density, Kirchoff stress) for the material
+   * @return The calculated material response (density, Cauchy stress) for the material
    */
   template <typename PositionType, typename DisplacementType, typename DispGradType>
   SERAC_HOST_DEVICE auto operator()(const PositionType& /* x */, const DisplacementType& /* displacement */,
@@ -161,7 +161,7 @@ public:
     // be removed by either putting the dual implementation of the global namespace or implementing a pure
     // double version there. More investigation into argument-dependent lookup is needed.
     using std::log;
-    auto stress = lambda * log(J) * I + shear_modulus_ * B_minus_I;
+    auto stress = (lambda * log(J) * I + shear_modulus_ * B_minus_I) / J;
 
     return MaterialResponse{density_, stress};
   }

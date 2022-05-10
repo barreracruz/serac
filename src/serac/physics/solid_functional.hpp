@@ -388,6 +388,7 @@ public:
           // du/dX' = du/dX * dX/dX' = du/dX * (dX'/dX)^-1 = du/dX * (I + dp/dX)^-1
           auto du_dX_prime = dot(du_dX, inv(I_ + dp_dX));
 
+          // Compute the density and Cauchy stress of the material model
           auto response = parameterized_material(x + p, u, du_dX_prime, serac::get<0>(params)...);
 
           double geom_factor = (geom_nonlin_ == GeometricNonlinearities::On ? 1.0 : 0.0);
@@ -397,7 +398,7 @@ public:
           // nonlinearities, we ignore the du/dX factor.
           auto deformation_grad = geom_factor * du_dX + dp_dX + I_;
 
-          auto flux = response.stress * inv(transpose(deformation_grad));
+          auto flux = response.stress * inv(transpose(deformation_grad)) * det(deformation_grad);
 
           return serac::tuple{source, flux};
         },
